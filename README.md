@@ -1,9 +1,5 @@
 # ROCKY-LINUX-SETUP
 
-Baiklah, faham. Anda mahukan satu dokumen rujukan lengkap—sebuah *master playbook*—yang mengandungi setiap arahan dan setiap blok konfigurasi yang diperlukan dari awal hingga akhir, supaya anda tidak perlu merujuk ke mana-mana tempat lain. Ini adalah amalan dokumentasi yang sangat baik.
-
-Mari kita bina panduan definitif tersebut. Gantikan semua nilai `SN` dan `IP` dengan spesifikasi anda.
-
 ---
 
 ### **Pelan Tindakan Definitif & Lengkap: Konfigurasi Pelayan Rocky Linux**
