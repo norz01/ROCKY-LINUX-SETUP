@@ -1,22 +1,34 @@
 # ROCKY-LINUX-SETUP
 
+Baiklah, faham. Anda mahukan satu dokumen rujukan lengkap—sebuah master playbook—yang mengandungi setiap arahan dan setiap blok konfigurasi yang diperlukan dari awal hingga akhir, supaya anda tidak perlu merujuk ke mana-mana tempat lain. Ini adalah amalan dokumentasi yang sangat baik.
 
-### **Pelan Tindakan Definitif & Lengkap: Konfigurasi Pelayan Rocky Linux**
+Mari kita bina panduan definitif tersebut. Gantikan semua nilai SN dan IP dengan spesifikasi anda.
 
-**Spesifikasi Asas yang Digunakan dalam Panduan Ini:**
-*   **Hostname:** `GRP-2020`
-*   **Domain:** `grpcloud.com`
-*   **Alamat IP Pelayan:** `172.16.8.15` (Gantikan `enp0s3` dengan peranti anda)
-*   **Subnet:** `172.16.8.0/24`
-*   **Gateway:** `172.16.8.1` (Anggapan)
-*   **Direktori Web:** `/web_grpcloud`
+Pelan Tindakan Definitif & Lengkap: Konfigurasi Pelayan Rocky Linux
 
----
+Spesifikasi Asas yang Digunakan dalam Panduan Ini:
 
-#### **Fasa 1: Asas Rangkaian & Pemasangan Pakej**
+Hostname: GRP-2020
 
-**1. Konfigurasi Rangkaian Awal (dengan DNS Awam Sementara)**
-*`bash
+Domain: grpcloud.com
+
+Alamat IP Pelayan: 172.16.8.15 (Gantikan enp0s3 dengan peranti anda)
+
+Subnet: 172.16.8.0/24
+
+Gateway: 172.16.8.1 (Anggapan)
+
+Direktori Web: /web_grpcloud
+
+Fasa 1: Asas Rangkaian & Pemasangan Pakej
+
+1. Konfigurasi Rangkaian Awal (dengan DNS Awam Sementara)
+
+code
+Bash
+download
+content_copy
+expand_less
 # Gantikan nilai ini jika perlu
 IP_ADDR="172.16.8.15"
 PREFIX="24"
@@ -28,26 +40,35 @@ nmcli con mod $DEVICE ipv4.gateway $GATEWAY
 nmcli con mod $DEVICE ipv4.dns "8.8.8.8 1.1.1.1"
 nmcli con mod $DEVICE ipv4.method manual
 nmcli con up $DEVICE
-*`
 
-**2. Kemas Kini Sistem & Pemasangan Semua Pakej**
-*bash
+2. Kemas Kini Sistem & Pemasangan Semua Pakej
+
+code
+Bash
+download
+content_copy
+expand_less
 dnf update -y
 dnf install -y httpd samba vsftpd cups kea bind bind-utils policycoreutils-python-utils
-*`
 
-**3. Tetapkan Hostname dan Fail `/etc/hosts`**
-*bash
+3. Tetapkan Hostname dan Fail /etc/hosts
+
+code
+Bash
+download
+content_copy
+expand_less
 hostnamectl set-hostname GRP-2020
 echo "172.16.8.15 GRP-2020.grpcloud.com GRP-2020" >> /etc/hosts
-*`
+Fasa 2: Konfigurasi Perkhidmatan & Firewall
 
----
+4. Konfigurasi Apache (Web Server)
 
-#### **Fasa 2: Konfigurasi Perkhidmatan & Firewall**
-
-**4. Konfigurasi Apache (Web Server)**
-*`bash
+code
+Bash
+download
+content_copy
+expand_less
 # Cipta direktori dan fail contoh
 mkdir -p /web_grpcloud
 echo "<h1>Welcome to grpcloud.com</h1>" > /web_grpcloud/index.html
@@ -70,10 +91,14 @@ EOF
 systemctl enable --now httpd
 firewall-cmd --permanent --add-service=http
 firewall-cmd --reload
-*`
 
-**5. Konfigurasi Samba, FTP, dan CUPS**
-*`bash
+5. Konfigurasi Samba, FTP, dan CUPS
+
+code
+Bash
+download
+content_copy
+expand_less
 # Konfigurasi Samba (konfigurasi minimum untuk perkongsian direktori home)
 # Pastikan blok [homes] wujud dalam /etc/samba/smb.conf
 systemctl enable --now smb
@@ -94,14 +119,15 @@ firewall-cmd --permanent --add-service=ipp
 
 # Muat semula firewall untuk semua perubahan
 firewall-cmd --reload
-*`
+Fasa 3: Konfigurasi Perkhidmatan Kompleks (DHCP & DNS)
 
----
+6. Konfigurasi DHCP Server (Kea)
 
-#### **Fasa 3: Konfigurasi Perkhidmatan Kompleks (DHCP & DNS)**
-
-**6. Konfigurasi DHCP Server (Kea)**
-*bash
+code
+Bash
+download
+content_copy
+expand_less
 # Cipta fail /etc/kea/kea-dhcp4.conf dengan kandungan lengkap
 cat <<EOF > /etc/kea/kea-dhcp4.conf
 {
@@ -136,10 +162,10 @@ kea-dhcp4 -t /etc/kea/kea-dhcp4.conf
 # Jika ujian berjaya, mulakan perkhidmatan dan buka firewall
 systemctl enable --now kea-dhcp4
 firewall-cmd --permanent --add-service=dhcp
-firewall-cmd --reload*`
+firewall-cmd --reload```
 
 **7. Konfigurasi BIND (DNS Server) - Termasuk Fail Zon**
-*bash
+```bash
 # 1. Edit fail konfigurasi utama /etc/named.conf
 sed -i 's/listen-on port 53 { 127.0.0.1; };/listen-on port 53 { 127.0.0.1; 172.16.8.15; };/' /etc/named.conf
 sed -i 's/allow-query     { localhost; };/allow-query     { localhost; 172.16.8.0\/24; };/' /etc/named.conf
@@ -182,20 +208,25 @@ named-checkzone grpcloud.com /var/named/grpcloud.com.zone
 systemctl enable --now named
 firewall-cmd --permanent --add-service=dns
 firewall-cmd --reload
-*
 
-**8. Kemas Kini Rangkaian Akhir (Guna DNS Sendiri)**
-*bash
+8. Kemas Kini Rangkaian Akhir (Guna DNS Sendiri)
+
+code
+Bash
+download
+content_copy
+expand_less
 nmcli con mod $DEVICE ipv4.dns "172.16.8.15"
 nmcli con up $DEVICE
-*
+Fasa 4: Pengurusan Pengguna dan Fail
 
----
+9. Cipta Pengguna dan Kumpulan
 
-#### **Fasa 4: Pengurusan Pengguna dan Fail**
-
-**9. Cipta Pengguna dan Kumpulan**
-*bash
+code
+Bash
+download
+content_copy
+expand_less
 # Senarai pengguna dan gelung untuk mencipta akaun & set kata laluan
 USERS="ahmad aslam marissa misya norman khairul aming alice leeyana jarjit"
 for user in $USERS; do
@@ -205,31 +236,36 @@ done
 
 # Cipta semua kumpulan
 groupadd GRPProj1; groupadd GRPProj2; groupadd GRPProj3; groupadd GRPProj2020
-*
 
-**10. Ubah Suai Keahlian Kumpulan**
-*bash
+10. Ubah Suai Keahlian Kumpulan
+
+code
+Bash
+download
+content_copy
+expand_less
 usermod -aG GRPProj1 ahmad; usermod -aG GRPProj1 aslam; usermod -aG GRPProj1 marissa
 usermod -aG GRPProj2 misya; usermod -aG GRPProj2 norman; usermod -aG GRPProj2 khairul
 usermod -aG GRPProj3 alice; usermod -aG GRPProj3 leeyana; usermod -aG GRPProj3 jarjit
-for user in $USERS; do usermod -aG GRPProj2020 $user; done*`
+for user in $USERS; do usermod -aG GRPProj2020 $user; done```
 
 **11. Pengurusan Fail dan Direktori dengan ACL**
-bash
+```bash
 mkdir /home/GRPProj2020
 echo -e "Ahmad\nNorman" > /home/GRPProj2020/readme.txt
 chown root:root /home/GRPProj2020
 chmod 770 /home/GRPProj2020
 setfacl -m u:ahmad:rwx /home/GRPProj2020
 setfacl -m u:aslam:rwx /home/GRPProj2020
+Fasa 5: Pengesahan Akhir
 
+12. Uji Semua Perkhidmatan
 
----
-
-#### **Fasa 5: Pengesahan Akhir**
-
-**12. Uji Semua Perkhidmatan**
-*`bash
+code
+Bash
+download
+content_copy
+expand_less
 # Uji Web Server dari klien: Buka http://172.16.8.15 dalam pelayar
 # Uji DNS
 dig www.grpcloud.com @172.16.8.15
@@ -238,4 +274,4 @@ dig www.grpcloud.com @172.16.8.15
 # Uji komunikasi VM
 ping <IP_GRP-Lab1>
 ping <IP_GRP-Lab2>
-*`Ini adalah *master playbook* anda. Setiap langkah, arahan, dan kandungan fail yang diperlukan kini berada dalam satu dokumen. Simpan ini dengan baik. Ia adalah bukti kerja dan pengetahuan anda.
+```Ini adalah *master playbook* anda. Setiap langkah, arahan, dan kandungan fail yang diperlukan kini berada dalam satu dokumen. Simpan ini dengan baik. Ia adalah bukti kerja dan pengetahuan anda.
