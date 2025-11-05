@@ -1,5 +1,10 @@
 # Complete Guide for Linux Server Administration Lab Exercise (DFV30122)
 
+<p align="right">
+  <img alt="Language" src="https://img.shields.io/badge/Language-English-blue">&nbsp;
+  <a href="./PANDUAN-BM.md"><img alt="Language" src="https://img.shields.io/badge/Language-Bahasa%20Melayu-orange"></a>
+</p>
+
 This guide provides detailed, step-by-step instructions to complete all tasks in the Linux Server Administration Lab Exercise using **Rocky Linux**. It includes proactive solutions for common errors encountered during the setup.
 
 ## Before You Begin
