@@ -1,5 +1,10 @@
 # Panduan Lengkap Latihan Makmal Pentadbiran Pelayan Linux (DFV30122)
 
+<p align="right">
+  <a href="./README.md"><img alt="Language" src="https://img.shields.io/badge/Language-English-blue"></a>&nbsp;
+  <img alt="Language" src="https://img.shields.io/badge/Language-Bahasa%20Melayu-orange">
+</p>
+
 Panduan ini menyediakan arahan langkah demi langkah yang terperinci untuk menyelesaikan semua tugasan dalam Latihan Makmal Pentadbiran Pelayan Linux menggunakan **Rocky Linux**. Ia merangkumi penyelesaian untuk ralat-ralat umum yang sering berlaku.
 
 ## Anasir Penting Sebelum Bermula
