@@ -361,7 +361,8 @@ id user2
 ```
 > Take a screenshot of this output.
 
-### c) Create Project Directory and File```bash
+### c) Create Project Directory and File
+```bash
 mkdir /home/TeamProjects
 echo "Name: <Your Full Name>, ID: <Your Student ID>" > /home/TeamProjects/readme.txt
 ```
